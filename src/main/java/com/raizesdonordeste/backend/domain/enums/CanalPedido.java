@@ -1,6 +1,6 @@
 package com.raizesdonordeste.backend.domain.enums;
 
-public class CanalPedido {
+public enum CanalPedido {
     APP,
     TOTEM,
     BALCAO,
