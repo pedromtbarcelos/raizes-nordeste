@@ -1,6 +1,6 @@
 package com.raizesdonordeste.backend.domain.enums;
 
-public class StatusPedido {
+public enum StatusPedido {
     AGUARDANDO_PAGAMENTO,
     EM_PREPARO,
     PRONTO,
