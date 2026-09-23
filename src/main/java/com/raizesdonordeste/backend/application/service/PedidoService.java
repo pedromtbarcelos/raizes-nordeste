@@ -2,13 +2,13 @@ package com.raizesdonordeste.backend.application.service;
 
 import com.raizesdonordeste.backend.application.exception.EstoqueInsuficienteException;
 import com.raizesdonordeste.backend.application.exception.RecursoNaoEncontradoException;
-import com.raizesdonordeste.backend.domain.*;
+import com.raizesdonordeste.backend.application.service.PagamentoService;
 import com.raizesdonordeste.backend.domain.entity.*;
 import com.raizesdonordeste.backend.domain.enums.StatusPedido;
 import com.raizesdonordeste.backend.infrastructure.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
