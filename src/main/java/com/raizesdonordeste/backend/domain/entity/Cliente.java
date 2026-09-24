@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "clientes")
 @Data
@@ -18,9 +17,15 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cliente")
     private Long id;
+
     private String nome;
     private String email;
     private String telefone;
+
     @Column(name = "saldo_pontos_fidelidade")
     private Integer saldoPontosFidelidade;
+
+    @OneToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 }
