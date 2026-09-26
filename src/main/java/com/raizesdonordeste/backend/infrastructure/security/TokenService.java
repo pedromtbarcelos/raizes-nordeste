@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.raizesdonordeste.backend.domain.entity.Usuario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +12,19 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-
 @Service
 public class TokenService {
 
     @Value("${api.security.token.secret:segredo-raizes-do-nordeste-default}")
     private String secret;
 
-    public String gerarToken(String subject) {
+    public String gerarToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("raizes-do-nordeste-api")
-                    .withSubject(subject)
+                    .withSubject(usuario.getEmail())
+                    .withClaim("role", usuario.getRole() != null ? usuario.getRole().name() : "ROLE_CLIENTE")
                     .withExpiresAt(dataExpiracao())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
