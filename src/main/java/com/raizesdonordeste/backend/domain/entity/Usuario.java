@@ -33,6 +33,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Role role = Role.ROLE_CLIENTE;
 
+    @Column(name = "consentimento_lgpd", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean consentimentoLgpd = false;
+
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Cliente cliente;
 
