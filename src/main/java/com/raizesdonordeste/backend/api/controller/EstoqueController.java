@@ -1,17 +1,18 @@
 package com.raizesdonordeste.backend.api.controller;
 
+import com.raizesdonordeste.backend.api.dto.request.AtualizarEstoqueRequest;
 import com.raizesdonordeste.backend.application.exception.RecursoNaoEncontradoException;
 import com.raizesdonordeste.backend.domain.entity.Estoque;
 import com.raizesdonordeste.backend.infrastructure.repository.EstoqueRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/estoque")
@@ -27,17 +28,12 @@ public class EstoqueController {
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
     public ResponseEntity atualizarEstoque(
             @PathVariable("id") Long idEstoque,
-            @RequestBody Map payload
+            @RequestBody @Valid AtualizarEstoqueRequest request
     ) {
-        Integer novaQuantidade = (Integer) payload.get("quantidadeSaldo");
-        if (novaQuantidade == null || novaQuantidade < 0) {
-            throw new IllegalArgumentException("A quantidade de saldo informada é inválida.");
-        }
-
         Estoque estoque = estoqueRepository.findById(idEstoque)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Registro de estoque não encontrado."));
 
-        estoque.setQuantidadeSaldo(novaQuantidade);
+        estoque.setQuantidadeSaldo(request.quantidadeSaldo());
         Estoque estoqueAtualizado = estoqueRepository.save(estoque);
 
         return ResponseEntity.ok(estoqueAtualizado);

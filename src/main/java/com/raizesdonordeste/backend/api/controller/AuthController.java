@@ -1,6 +1,7 @@
 package com.raizesdonordeste.backend.api.controller;
 
-import com.raizesdonordeste.backend.api.dto.request.AuthRequest;
+import com.raizesdonordeste.backend.api.dto.request.LoginRequest;
+import com.raizesdonordeste.backend.api.dto.request.RegistroRequest;
 import com.raizesdonordeste.backend.application.service.UsuarioService;
 import com.raizesdonordeste.backend.domain.entity.Usuario;
 import com.raizesdonordeste.backend.infrastructure.security.TokenService;
@@ -12,9 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -28,15 +33,15 @@ public class AuthController {
 
     @PostMapping("/registrar")
     @Operation(summary = "Cadastra um novo usuário no banco de dados")
-    public ResponseEntity<Map<String, String>> registrar(@RequestBody @Valid AuthRequest request) {
-        usuarioService.registrarUsuario(request.email(), request.senha());
+    public ResponseEntity registrar(@RequestBody @Valid RegistroRequest request) {
+        usuarioService.registrarUsuario(request.email(), request.senha(), request.role(), request.consentimentoLgpd());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("mensagem", "Usuário cadastrado com sucesso!"));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Realiza login e gera o token JWT para usuários cadastrados")
-    public ResponseEntity<Map<String, String>> login(@RequestBody @Valid AuthRequest request) {
+    public ResponseEntity login(@RequestBody @Valid LoginRequest request) {
         var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.senha());
         var authentication = authenticationManager.authenticate(authToken);
 
