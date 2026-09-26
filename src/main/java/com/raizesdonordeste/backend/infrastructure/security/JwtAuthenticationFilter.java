@@ -1,5 +1,6 @@
 package com.raizesdonordeste.backend.infrastructure.security;
 
+import com.raizesdonordeste.backend.infrastructure.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,20 +9,18 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import com.raizesdonordeste.backend.infrastructure.security.TokenService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
-
-
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     protected void doFilterInternal(
@@ -36,9 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String subject = tokenService.validarToken(token);
 
             if (subject != null) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(subject, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetails usuario = usuarioRepository.findByEmail(subject);
+                if (usuario != null) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 

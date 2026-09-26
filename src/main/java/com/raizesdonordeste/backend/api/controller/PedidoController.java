@@ -4,6 +4,7 @@ import com.raizesdonordeste.backend.api.dto.request.PedidoRequest;
 import com.raizesdonordeste.backend.api.dto.response.PedidoResponse;
 import com.raizesdonordeste.backend.application.service.PedidoService;
 import com.raizesdonordeste.backend.domain.entity.*;
+import com.raizesdonordeste.backend.domain.enums.StatusPedido;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,10 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,5 +91,15 @@ public class PedidoController {
                 .statusPedido(pedido.getStatusPedido())
                 .dataPedido(pedido.getDataPedido())
                 .build();
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Atualiza o status do pedido (Cozinha/Atendimento)")
+    public ResponseEntity atualizarStatus(
+            @PathVariable("id") Long idPedido,
+            @RequestParam StatusPedido novoStatus
+    ) {
+        Pedido pedidoAtualizado = pedidoService.atualizarStatus(idPedido, novoStatus);
+        return ResponseEntity.ok(mapToResponse(pedidoAtualizado));
     }
 }

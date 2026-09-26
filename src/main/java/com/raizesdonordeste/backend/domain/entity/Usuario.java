@@ -1,12 +1,14 @@
 package com.raizesdonordeste.backend.domain.entity;
 
+import com.raizesdonordeste.backend.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -27,12 +29,19 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.ROLE_CLIENTE;
+
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Cliente cliente;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+    public Collection getAuthorities() {
+        if (role == null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+        }
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
