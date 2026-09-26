@@ -7,11 +7,14 @@ import com.raizesdonordeste.backend.infrastructure.repository.PedidoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/v1/pagamentos")
@@ -23,7 +26,7 @@ public class PagamentoController {
 
     @PostMapping("/mock")
     @Operation(summary = "Simula a confirmação de pagamento por um gateway externo")
-    public ResponseEntity> HttpEntity<Map<String, String>> processarWebhookPagamento(
+    public ResponseEntity<Map<String, String>> processarWebhookPagamento(
             @RequestParam Long idPedido,
             @RequestParam boolean aprovado
     ) {

@@ -40,7 +40,7 @@ public class AuthController {
         var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.senha());
         var authentication = authenticationManager.authenticate(authToken);
 
-        var token = tokenService.gerarToken(((Usuario) authentication.getPrincipal()).getUsername());
+        var token = tokenService.gerarToken((Usuario) authentication.getPrincipal());
         return ResponseEntity.ok(Map.of("token", token));
     }
 }

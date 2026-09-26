@@ -1,4 +1,7 @@
+package com.raizesdonordeste.backend.api.controller;
+
 import com.raizesdonordeste.backend.domain.entity.Estoque;
+import com.raizesdonordeste.backend.domain.entity.Produto;
 import com.raizesdonordeste.backend.infrastructure.repository.EstoqueRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,12 +25,15 @@ public class UnidadeController {
 
     @GetMapping("/{id}/cardapio")
     @Operation(summary = "Consulta o cardápio (produtos disponíveis no estoque) de uma unidade específica")
-    public ResponseEntity> obterCardapioPorUnidade(@PathVariable("id") Long idUnidade) {
-        List estoques = estoqueRepository.findAll().stream()
-                .filter(e -> e.getUnidade().getId().equals(idUnidade) && e.getQuantidadeSaldo() > 0)
+    public ResponseEntity<List<Produto>> obterCardapioPorUnidade(
+            @PathVariable("id") Long idUnidade) {
+
+        List<Estoque> estoques = estoqueRepository.findAll().stream()
+                .filter(e -> e.getUnidade().getId().equals(idUnidade)
+                        && e.getQuantidadeSaldo() > 0)
                 .collect(Collectors.toList());
 
-        List cardapio = estoques.stream()
+        List<Produto> cardapio = estoques.stream()
                 .map(Estoque::getProduto)
                 .collect(Collectors.toList());
 
