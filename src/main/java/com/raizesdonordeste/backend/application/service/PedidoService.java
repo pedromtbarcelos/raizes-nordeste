@@ -2,13 +2,12 @@ package com.raizesdonordeste.backend.application.service;
 
 import com.raizesdonordeste.backend.application.exception.EstoqueInsuficienteException;
 import com.raizesdonordeste.backend.application.exception.RecursoNaoEncontradoException;
-import com.raizesdonordeste.backend.domain.*;
 import com.raizesdonordeste.backend.domain.entity.*;
 import com.raizesdonordeste.backend.domain.enums.StatusPedido;
 import com.raizesdonordeste.backend.infrastructure.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,9 +27,9 @@ public class PedidoService {
     @Transactional
     public Pedido criarPedido(Pedido pedidoSolicitado) {
         if (pedidoSolicitado.getIdempotencyKey() != null) {
-            Optional<Pedido> pedidoExistente = pedidoRepository.findByIdempotencyKey(pedidoSolicitado.getIdempotencyKey());
+            Optional pedidoExistente = pedidoRepository.findByIdempotencyKey(pedidoSolicitado.getIdempotencyKey());
             if (pedidoExistente.isPresent()) {
-                return pedidoExistente.get();
+                return (Pedido) pedidoExistente.get();
             }
         }
 
@@ -77,6 +76,11 @@ public class PedidoService {
 
         if (pagamentoAprovado) {
             pedidoSalvo.setStatusPedido(StatusPedido.EM_PREPARO);
+            int pontosGanhos = pedidoSalvo.getValorTotal().intValue();
+            Integer saldoAtual = cliente.getPontosFidelidade() != null ? cliente.getPontosFidelidade() : 0;
+            cliente.setPontosFidelidade(saldoAtual + pontosGanhos);
+            clienteRepository.save(cliente);
+
         } else {
             pedidoSalvo.setStatusPedido(StatusPedido.PAGAMENTO_RECUSADO);
             estornarEstoque(pedidoSalvo);
@@ -93,5 +97,13 @@ public class PedidoService {
             estoque.setQuantidadeSaldo(estoque.getQuantidadeSaldo() + item.getQuantidade());
             estoqueRepository.save(estoque);
         }
+    }
+
+    @Transactional
+    public Pedido atualizarStatus(Long idPedido, StatusPedido novoStatus) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado."));
+        pedido.setStatusPedido(novoStatus);
+        return pedidoRepository.save(pedido);
     }
 }
