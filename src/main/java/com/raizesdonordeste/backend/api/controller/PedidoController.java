@@ -14,17 +14,23 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/v1/pedidos")
 @RequiredArgsConstructor
-@Tag(name = "Pedidos", description = "Endpoints para criação e gerenciamento de pedidos")
+@Tag(
+        name = "Pedidos",
+        description = "Endpoints para criação e gerenciamento de pedidos"
+)
 @SecurityRequirement(name = "bearerAuth")
 public class PedidoController {
 
@@ -38,26 +44,109 @@ public class PedidoController {
             @ApiResponse(
                     responseCode = "201",
                     description = "Pedido criado com sucesso",
-                    content = @Content(schema = @Schema(implementation = PedidoResponse.class))
+                    content = @Content(
+                            schema = @Schema(implementation = PedidoResponse.class)
+                    )
             ),
-            @ApiResponse(responseCode = "400", description = "Dados do pedido incompletos ou incorretos."),
-            @ApiResponse(responseCode = "404", description = "Cliente, unidade ou produto não encontrado."),
-            @ApiResponse(responseCode = "409", description = "Estoque insuficiente para a quantidade solicitada.")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados do pedido incompletos ou incorretos."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cliente, unidade ou produto não encontrado."
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Estoque insuficiente para a quantidade solicitada."
+            )
     })
     @PostMapping
-    public ResponseEntity<PedidoResponse> criarPedido(@Valid @RequestBody PedidoRequest request) {
+    @PreAuthorize("hasAnyRole('CLIENTE', 'GERENTE', 'ADMIN')")
+    public ResponseEntity<PedidoResponse> criarPedido(
+            @Valid @RequestBody PedidoRequest request
+    ) {
         Pedido pedidoSolicitado = mapToEntity(request);
+
         Pedido pedidoCriado = pedidoService.criarPedido(pedidoSolicitado);
+
         PedidoResponse response = mapToResponse(pedidoCriado);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @GetMapping
+    @Operation(summary = "Listar pedidos com paginação")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'GERENTE', 'ADMIN')")
+    public ResponseEntity<Page<PedidoResponse>> listarPedidos(
+            Pageable pageable
+    ) {
+        Page<Pedido> pedidos = pedidoService.listarPedidos(pageable);
+
+        Page<PedidoResponse> response = pedidos.map(this::mapToResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Consultar um pedido específico por ID")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'GERENTE', 'ADMIN')")
+    public ResponseEntity<PedidoResponse> buscarPedidoPorId(
+            @PathVariable("id") Long idPedido
+    ) {
+        Pedido pedido = pedidoService.buscarPorId(idPedido);
+
+        return ResponseEntity.ok(mapToResponse(pedido));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Atualiza o status do pedido (Cozinha/Atendimento)")
+    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
+    public ResponseEntity<PedidoResponse> atualizarStatus(
+            @PathVariable("id") Long idPedido,
+            @RequestParam StatusPedido novoStatus
+    ) {
+        Pedido pedidoAtualizado =
+                pedidoService.atualizarStatus(
+                        idPedido,
+                        novoStatus
+                );
+
+        return ResponseEntity.ok(
+                mapToResponse(pedidoAtualizado)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Cancelar/Excluir um pedido (Restrito para GERENTE ou ADMIN)"
+    )
+    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
+    public ResponseEntity<Void> excluirPedido(
+            @PathVariable("id") Long idPedido
+    ) {
+        pedidoService.excluirPedido(idPedido);
+
+        return ResponseEntity.noContent().build();
     }
 
     private Pedido mapToEntity(PedidoRequest request) {
+
         Pedido pedido = new Pedido();
-        pedido.setIdempotencyKey(request.getIdempotencyKey());
-        pedido.setCanalPedido(request.getCanalPedido());
-        pedido.setFormaPagamento(request.getFormaPagamento());
+
+        pedido.setIdempotencyKey(
+                request.getIdempotencyKey()
+        );
+
+        pedido.setCanalPedido(
+                request.getCanalPedido()
+        );
+
+        pedido.setFormaPagamento(
+                request.getFormaPagamento()
+        );
 
         Cliente cliente = new Cliente();
         cliente.setId(request.getIdCliente());
@@ -67,14 +156,27 @@ public class PedidoController {
         unidade.setId(request.getIdUnidade());
         pedido.setUnidade(unidade);
 
-        List<ItemPedido> itens = request.getItens().stream().map(itemRequest -> {
-            ItemPedido item = new ItemPedido();
-            item.setQuantidade(itemRequest.getQuantidade());
-            Produto produto = new Produto();
-            produto.setId(itemRequest.getIdProduto());
-            item.setProduto(produto);
-            return item;
-        }).collect(Collectors.toList());
+        List<ItemPedido> itens = request.getItens()
+                .stream()
+                .map(itemRequest -> {
+
+                    ItemPedido item = new ItemPedido();
+
+                    item.setQuantidade(
+                            itemRequest.getQuantidade()
+                    );
+
+                    Produto produto = new Produto();
+
+                    produto.setId(
+                            itemRequest.getIdProduto()
+                    );
+
+                    item.setProduto(produto);
+
+                    return item;
+                })
+                .toList();
 
         itens.forEach(pedido::adicionarItem);
 
@@ -82,6 +184,7 @@ public class PedidoController {
     }
 
     private PedidoResponse mapToResponse(Pedido pedido) {
+
         return PedidoResponse.builder()
                 .idPedido(pedido.getId())
                 .idCliente(pedido.getCliente().getId())
@@ -91,15 +194,5 @@ public class PedidoController {
                 .statusPedido(pedido.getStatusPedido())
                 .dataPedido(pedido.getDataPedido())
                 .build();
-    }
-
-    @PatchMapping("/{id}/status")
-    @Operation(summary = "Atualiza o status do pedido (Cozinha/Atendimento)")
-    public ResponseEntity atualizarStatus(
-            @PathVariable("id") Long idPedido,
-            @RequestParam StatusPedido novoStatus
-    ) {
-        Pedido pedidoAtualizado = pedidoService.atualizarStatus(idPedido, novoStatus);
-        return ResponseEntity.ok(mapToResponse(pedidoAtualizado));
     }
 }
