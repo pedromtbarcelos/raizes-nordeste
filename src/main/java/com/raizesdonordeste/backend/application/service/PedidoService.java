@@ -2,16 +2,28 @@ package com.raizesdonordeste.backend.application.service;
 
 import com.raizesdonordeste.backend.application.exception.EstoqueInsuficienteException;
 import com.raizesdonordeste.backend.application.exception.RecursoNaoEncontradoException;
-import com.raizesdonordeste.backend.domain.entity.*;
+import com.raizesdonordeste.backend.domain.entity.Cliente;
+import com.raizesdonordeste.backend.domain.entity.Estoque;
+import com.raizesdonordeste.backend.domain.entity.ItemPedido;
+import com.raizesdonordeste.backend.domain.entity.Pedido;
+import com.raizesdonordeste.backend.domain.entity.Produto;
+import com.raizesdonordeste.backend.domain.entity.Unidade;
 import com.raizesdonordeste.backend.domain.enums.StatusPedido;
-import com.raizesdonordeste.backend.infrastructure.repository.*;
+import com.raizesdonordeste.backend.infrastructure.repository.ClienteRepository;
+import com.raizesdonordeste.backend.infrastructure.repository.EstoqueRepository;
+import com.raizesdonordeste.backend.infrastructure.repository.PedidoRepository;
+import com.raizesdonordeste.backend.infrastructure.repository.ProdutoRepository;
+import com.raizesdonordeste.backend.infrastructure.repository.UnidadeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,18 +38,34 @@ public class PedidoService {
 
     @Transactional
     public Pedido criarPedido(Pedido pedidoSolicitado) {
+
         if (pedidoSolicitado.getIdempotencyKey() != null) {
-            Optional pedidoExistente = pedidoRepository.findByIdempotencyKey(pedidoSolicitado.getIdempotencyKey());
+
+            Optional<Pedido> pedidoExistente =
+                    pedidoRepository.findByIdempotencyKey(
+                            pedidoSolicitado.getIdempotencyKey()
+                    );
+
             if (pedidoExistente.isPresent()) {
-                return (Pedido) pedidoExistente.get();
+                return pedidoExistente.get();
             }
         }
 
-        Unidade unidade = unidadeRepository.findById(pedidoSolicitado.getUnidade().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Unidade não encontrada."));
+        Unidade unidade = unidadeRepository
+                .findById(pedidoSolicitado.getUnidade().getId())
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Unidade não encontrada."
+                        )
+                );
 
-        Cliente cliente = clienteRepository.findById(pedidoSolicitado.getCliente().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado."));
+        Cliente cliente = clienteRepository
+                .findById(pedidoSolicitado.getCliente().getId())
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Cliente não encontrado."
+                        )
+                );
 
         pedidoSolicitado.setUnidade(unidade);
         pedidoSolicitado.setCliente(cliente);
@@ -45,44 +73,91 @@ public class PedidoService {
         BigDecimal valorTotal = BigDecimal.ZERO;
 
         for (ItemPedido item : pedidoSolicitado.getItens()) {
-            Produto produto = produtoRepository.findById(item.getProduto().getId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado."));
 
-            Estoque estoque = estoqueRepository.findByUnidadeIdAndProdutoId(unidade.getId(), produto.getId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Estoque não configurado para o produto " + produto.getNome() + " nesta unidade."));
+            Produto produto = produtoRepository
+                    .findById(item.getProduto().getId())
+                    .orElseThrow(() ->
+                            new RecursoNaoEncontradoException(
+                                    "Produto não encontrado."
+                            )
+                    );
+
+            Estoque estoque = estoqueRepository
+                    .findByUnidadeIdAndProdutoId(
+                            unidade.getId(),
+                            produto.getId()
+                    )
+                    .orElseThrow(() ->
+                            new RecursoNaoEncontradoException(
+                                    "Estoque não configurado para o produto "
+                                            + produto.getNome()
+                                            + " nesta unidade."
+                            )
+                    );
 
             if (estoque.getQuantidadeSaldo() < item.getQuantidade()) {
-                throw new EstoqueInsuficienteException("Estoque insuficiente para o produto: " + produto.getNome());
+                throw new EstoqueInsuficienteException(
+                        "Estoque insuficiente para o produto: "
+                                + produto.getNome()
+                );
             }
 
-            estoque.setQuantidadeSaldo(estoque.getQuantidadeSaldo() - item.getQuantidade());
+            estoque.setQuantidadeSaldo(
+                    estoque.getQuantidadeSaldo()
+                            - item.getQuantidade()
+            );
+
             estoqueRepository.save(estoque);
 
             item.setProduto(produto);
             item.setPrecoUnitarioHistorico(produto.getPreco());
             item.setPedido(pedidoSolicitado);
 
-            BigDecimal subtotal = produto.getPreco().multiply(BigDecimal.valueOf(item.getQuantidade()));
+            BigDecimal subtotal = produto.getPreco()
+                    .multiply(
+                            BigDecimal.valueOf(item.getQuantidade())
+                    );
+
             valorTotal = valorTotal.add(subtotal);
         }
 
         pedidoSolicitado.setValorTotal(valorTotal);
-        pedidoSolicitado.setStatusPedido(StatusPedido.AGUARDANDO_PAGAMENTO);
+        pedidoSolicitado.setStatusPedido(
+                StatusPedido.AGUARDANDO_PAGAMENTO
+        );
         pedidoSolicitado.setDataPedido(LocalDateTime.now());
 
         Pedido pedidoSalvo = pedidoRepository.save(pedidoSolicitado);
 
-        boolean pagamentoAprovado = pagamentoService.processarPagamento(pedidoSalvo);
+        boolean pagamentoAprovado =
+                pagamentoService.processarPagamento(pedidoSalvo);
 
         if (pagamentoAprovado) {
-            pedidoSalvo.setStatusPedido(StatusPedido.EM_PREPARO);
-            int pontosGanhos = pedidoSalvo.getValorTotal().intValue();
-            Integer saldoAtual = cliente.getPontosFidelidade() != null ? cliente.getPontosFidelidade() : 0;
-            cliente.setPontosFidelidade(saldoAtual + pontosGanhos);
+
+            pedidoSalvo.setStatusPedido(
+                    StatusPedido.EM_PREPARO
+            );
+
+            int pontosGanhos =
+                    pedidoSalvo.getValorTotal().intValue();
+
+            Integer saldoAtual =
+                    cliente.getPontosFidelidade() != null
+                            ? cliente.getPontosFidelidade()
+                            : 0;
+
+            cliente.setPontosFidelidade(
+                    saldoAtual + pontosGanhos
+            );
+
             clienteRepository.save(cliente);
 
         } else {
-            pedidoSalvo.setStatusPedido(StatusPedido.PAGAMENTO_RECUSADO);
+
+            pedidoSalvo.setStatusPedido(
+                    StatusPedido.PAGAMENTO_RECUSADO
+            );
+
             estornarEstoque(pedidoSalvo);
         }
 
@@ -90,20 +165,72 @@ public class PedidoService {
     }
 
     private void estornarEstoque(Pedido pedido) {
-        for (ItemPedido item : pedido.getItens()) {
-            Estoque estoque = estoqueRepository.findByUnidadeIdAndProdutoId(pedido.getUnidade().getId(), item.getProduto().getId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Erro ao localizar estoque para estorno."));
 
-            estoque.setQuantidadeSaldo(estoque.getQuantidadeSaldo() + item.getQuantidade());
+        for (ItemPedido item : pedido.getItens()) {
+
+            Estoque estoque = estoqueRepository
+                    .findByUnidadeIdAndProdutoId(
+                            pedido.getUnidade().getId(),
+                            item.getProduto().getId()
+                    )
+                    .orElseThrow(() ->
+                            new RecursoNaoEncontradoException(
+                                    "Erro ao localizar estoque para estorno."
+                            )
+                    );
+
+            estoque.setQuantidadeSaldo(
+                    estoque.getQuantidadeSaldo()
+                            + item.getQuantidade()
+            );
+
             estoqueRepository.save(estoque);
         }
     }
 
     @Transactional
-    public Pedido atualizarStatus(Long idPedido, StatusPedido novoStatus) {
-        Pedido pedido = pedidoRepository.findById(idPedido)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado."));
+    public Pedido atualizarStatus(
+            Long idPedido,
+            StatusPedido novoStatus
+    ) {
+        Pedido pedido = pedidoRepository
+                .findById(idPedido)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Pedido não encontrado."
+                        )
+                );
+
         pedido.setStatusPedido(novoStatus);
+
         return pedidoRepository.save(pedido);
+    }
+
+    public Page<Pedido> listarPedidos(Pageable pageable) {
+        return pedidoRepository.findAll(pageable);
+    }
+
+    public Pedido buscarPorId(Long id) {
+        return pedidoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Pedido não encontrado."
+                        )
+                );
+    }
+
+    @Transactional
+    public void excluirPedido(Long id) {
+
+        Pedido pedido = buscarPorId(id);
+
+        if (pedido.getStatusPedido()
+                != StatusPedido.PAGAMENTO_RECUSADO) {
+
+            estornarEstoque(pedido);
+        }
+
+        pedidoRepository.delete(pedido);
     }
 }
