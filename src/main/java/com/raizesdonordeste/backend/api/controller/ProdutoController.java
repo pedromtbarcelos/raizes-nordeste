@@ -60,7 +60,7 @@ public class ProdutoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar um produto existente (Restrito para GERENTE ou ADMIN)")
-    @SecurityRequirement(name = "bearerAuth") // Exibe o cadeado no Swagger para esta rota protegida
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
     public ResponseEntity atualizarProduto(
             @PathVariable("id") Long id,
@@ -80,7 +80,7 @@ public class ProdutoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir um produto do catálogo (Restrito para GERENTE ou ADMIN)")
-    @SecurityRequirement(name = "bearerAuth") // Exibe o cadeado no Swagger para esta rota protegida
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
     public ResponseEntity excluirProduto(@PathVariable("id") Long id) {
         Produto produto = produtoRepository.findById(id)

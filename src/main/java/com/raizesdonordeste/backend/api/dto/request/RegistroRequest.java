@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+
 public record RegistroRequest(
         @NotBlank(message = "O e-mail é obrigatório.")
         @Email(message = "Formato de e-mail inválido.")
@@ -16,4 +17,5 @@ public record RegistroRequest(
 
         @NotNull(message = "O consentimento LGPD é obrigatório.")
         Boolean consentimentoLgpd
-) {}
+) {
+}
