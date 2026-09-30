@@ -1,0 +1,348 @@
+{
+  "info": {
+    "_postman_id": "bc12f363-ebd7-477a-b9fb-d3ebf8da0877",
+    "name": "raizes-do-nordeste",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39096681"
+  },
+  "item": [
+    {
+      "name": "T01 - Registo de novo cliente no sistema",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"123\", \"role\": \"ROLE_CLIENTE\", \"consentimentoLgpd\": true }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/auth/registrar",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "registrar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T02 - Tentativa de login com senha incorreta",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"000\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T03 - Login com credenciais válidas",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"123\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T04 - Acesso a recurso protegido sem enviar token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T05 - Tentativa de alteração de estoque com perfil de cliente",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"quantidadeSaldo\": 150}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/estoques/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "estoques",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T06 - Consulta de cardápio filtrado por unidade",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/unidades/1/cardapio",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "unidades",
+            "1",
+            "cardapio"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T07 - Criação de pedido com canal e estoque válidos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idempotencyKey\": \"t07-key\", \"idCliente\": 1, \"idUnidade\": 1, \"canalPedido\": \"TOTEM\", \"itens\": [{\"idProduto\": 1, \"quantidade\": 2}], \"formaPagamento\": \"PIX\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T08 - Criação de pedido com quantidade superior ao estoque",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idempotencyKey\": \"t08-key\", \"idCliente\": 1, \"idUnidade\": 1, \"canalPedido\": \"APP\", \"itens\": [{\"idProduto\": 1, \"quantidade\": 999}], \"formaPagamento\": \"PIX\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T09 - Processamento de pagamento simulado aprovado",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/pagamentos/mock?idPedido=1&aprovado=true",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "pagamentos",
+            "mock"
+          ],
+          "query": [
+            {
+              "key": "idPedido",
+              "value": "1"
+            },
+            {
+              "key": "aprovado",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "T10 - Consulta do saldo do programa de fidelidade",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/fidelidade/saldo",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "fidelidade",
+            "saldo"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
