@@ -13,7 +13,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"123\", \"role\": \"ROLE_CLIENTE\", \"consentimentoLgpd\": true }",
+          "raw": "{ \r\n  \"email\": \"\", \r\n  \"senha\": \"\", \r\n  \"role\": \"ROLE_CLIENTE\", \r\n  \"consentimentoLgpd\": true \r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -33,7 +33,8 @@
             "auth",
             "registrar"
           ]
-        }
+        },
+        "description": "1. Verifique se o método HTTP está selecionado como `POST` e o URL aponta para `http://localhost:8080/api/v1/auth/registrar`\n    \n2. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n3. Confirme se o seguinte conteúdo está presente:\n    \n    1. {  \n        \"email\": \"[seu-email](https://mailto:cliente@email.com)\",  \n        \"senha\": \"sua-senha\",  \n        \"role\": \"ROLE_CLIENTE\",  \n        \"consentimentoLgpd\": true  \n        }\n        \n4. Clique em Send\n    \n5. Validação: Na área inferior de resposta, confirme se o status retornado é 201 Created e a mensagem indica sucesso no registo do utilizador."
       },
       "response": []
     },
@@ -44,7 +45,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"000\" }",
+          "raw": "{ \r\n  \"email\": \"\", \r\n  \"senha\": \"\" \r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -64,7 +65,8 @@
             "auth",
             "login"
           ]
-        }
+        },
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/auth/login`\n    \n2. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n3. Confirme se o seguinte conteúdo está presente:\n    \n    1. {  \n        \"email\": \"seu-email\",  \n        \"senha\": \"sua-senha\"  \n        }\n        \n4. Na aba Body (raw / JSON), confirme o envio de uma senha diferente da escolhida no T01\n    \n5. Clique em Send\n    \n6. Validação: O Postman deve retornar o status 401 Unauthorized com uma estrutura de erro de autenticação."
       },
       "response": []
     },
@@ -75,7 +77,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{ \"email\": \"cliente@email.com\", \"senha\": \"123\" }",
+          "raw": "{ \r\n  \"email\": \"\", \r\n  \"senha\": \"\" \r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -95,7 +97,8 @@
             "auth",
             "login"
           ]
-        }
+        },
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/auth/login`\n    \n2. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n3. Confirme se o seguinte conteúdo está presente:\n    \n    1. {  \n        \"email\": \"seu-email\",  \n        \"senha\": \"sua-senha\"  \n        }\n        \n4. Na aba Body (raw / JSON), confirme o envio do email e da senha correto escolhido no T01\n    \n5. Clique em Send\n    \n6. Validação: A resposta exibirá o status 200 OK\n    \n7. Passo Essencial para os testes seguintes: No corpo da resposta, localize o campo \"token\" e copie toda a string gerada (exemplo: eyJhbGciOi...). Ela será necessária para autorizar as requisições protegidas."
       },
       "response": []
     },
@@ -125,7 +128,8 @@
             "v1",
             "pedidos"
           ]
-        }
+        },
+        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers ou Authorization, garanta que nenhum header Authorization está sendo enviado\n    \n3. Na aba Body (raw / JSON), garanta que não tenha nenhum JSON\n    \n4. Clique em Send.\n    \n5. Validação: A API deve recusar o acesso e retornar o status 401 Unauthorized"
       },
       "response": []
     },
@@ -161,7 +165,8 @@
             "estoques",
             "1"
           ]
-        }
+        },
+        "description": "1. Verifique o método `PUT` e o URL `http://localhost:8080/api/v1/estoques/1`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n4. Confirme se o seguinte conteúdo está presente:\n    \n    1. { \"quantidadeSaldo\": 150 }\n        \n5. Clique em Send\n    \n6. Validação: Como a conta possui o perfil ROLE_CLIENTE, o sistema deve negar a ação e retornar o status 403 Forbidden"
       },
       "response": []
     },
@@ -193,7 +198,8 @@
             "1",
             "cardapio"
           ]
-        }
+        },
+        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/unidades/1/cardapio`\n    \n2. Por se tratar de um endpoint público de consulta, não é necessário enviar corpo nem token\n    \n3. Clique em Send\n    \n4. Validação: A resposta deve ser 200 OK, contendo a lista de produtos associados à unidade 1"
       },
       "response": []
     },
@@ -209,7 +215,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"idempotencyKey\": \"t07-key\", \"idCliente\": 1, \"idUnidade\": 1, \"canalPedido\": \"TOTEM\", \"itens\": [{\"idProduto\": 1, \"quantidade\": 2}], \"formaPagamento\": \"PIX\"}",
+          "raw": "{\r\n  \"idempotencyKey\": \"t07-key\",\r\n  \"idCliente\": 1,\r\n  \"idUnidade\": 1,\r\n  \"canalPedido\": \"TOTEM\",\r\n  \"itens\": [{\"idProduto\": 1, \"quantidade\": 2}],\r\n  \"formaPagamento\": \"PIX\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -228,7 +234,8 @@
             "v1",
             "pedidos"
           ]
-        }
+        },
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t07-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"TOTEM\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 2}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Clique em Send\n    \n5. Validação: Confirme o status 201 Created e tome nota do id do pedido criado (ex: id: 1) e do status inicial AGUARDANDO_PAGAMENTO"
       },
       "response": []
     },
@@ -244,7 +251,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"idempotencyKey\": \"t08-key\", \"idCliente\": 1, \"idUnidade\": 1, \"canalPedido\": \"APP\", \"itens\": [{\"idProduto\": 1, \"quantidade\": 999}], \"formaPagamento\": \"PIX\"}",
+          "raw": "{\r\n  \"idempotencyKey\": \"t08-key\",\r\n  \"idCliente\": 1,\r\n  \"idUnidade\": 1,\r\n  \"canalPedido\": \"APP\",\r\n  \"itens\": [{\"idProduto\": 1, \"quantidade\": 999}],\r\n  \"formaPagamento\": \"PIX\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -263,7 +270,8 @@
             "v1",
             "pedidos"
           ]
-        }
+        },
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Vá à aba Headers, enc\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t08-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"APP\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 999}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Na aba Body (raw / JSON), note a tentativa de compra de uma quantidade intencionalmente alta (999)\n    \n5. Clique em Send\n    \n6. Validação: A resposta deve indicar erro de regra de negócio por escassez de estoque (status 409 Conflict ou 422 Unprocessable Entity)"
       },
       "response": []
     },
@@ -282,7 +290,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/pagamentos/mock?idPedido=1&aprovado=true",
+          "raw": "http://localhost:8080/api/v1/pagamentos/mock?idPedido=&aprovado=true",
           "protocol": "http",
           "host": [
             "localhost"
@@ -297,14 +305,15 @@
           "query": [
             {
               "key": "idPedido",
-              "value": "1"
+              "value": ""
             },
             {
               "key": "aprovado",
               "value": "true"
             }
           ]
-        }
+        },
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pagamentos/mock?idPedido=1&aprovado=true`\n    \n2. Vá à aba Params e valide se os parâmetros de URL estão configurados como idPedido = \\[Valor informado no T07\\] e aprovado = true\n    \n3. Clique em Send\n    \n4. Validação: Confirme o retorno 200 OK indicando a aprovação do pagamento e a transição do status do pedido para EM_PREPARO"
       },
       "response": []
     },
@@ -340,7 +349,8 @@
             "fidelidade",
             "saldo"
           ]
-        }
+        },
+        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/fidelidade/saldo`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Clique em Send\n    \n4. Validação: A resposta deve exibir 200 OK juntamente com o saldo atualizado dos pontos de fidelidade acumulados pelo cliente"
       },
       "response": []
     }
