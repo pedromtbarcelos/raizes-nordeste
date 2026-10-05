@@ -1,59 +1,60 @@
 # Raízes do Nordeste
-##
 
 ## Requisitos
-•	Linguagem: Java
 
-•	Versão: Java SDK 21
-
-•	Banco: PostgreSQL
-
-•	Dependências: Todas as dependências definidas no pom.xml
+- **Linguagem:** Java 21
+- **Framework:** Spring Boot 4.x
+- **Base de Dados:** PostgreSQL
+- **Gestor de Dependências:** Maven
 
 ## Como Configurar o Banco de Dados
 
 Para rodar o projeto localmente, não é necessário criar arquivos .env extras. 
 
 Basta abrir o arquivo src/main/resources/application.properties e garantir que as configurações do PostgreSQL estejam estruturadas conforme abaixo:
-
+```
 spring.application.name=backend
-
 server.port=8080
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/db_raizes_nordeste
-
 spring.datasource.username=postgres
-
 spring.datasource.password=1234
 
 spring.jpa.hibernate.ddl-auto=update
-
 spring.jpa.show-sql=true
-
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-
 spring.jpa.defer-datasource-initialization=true
-
 spring.sql.init.mode=always
+```
 
 ## Como Executar o Projeto
 
-### Instalar Dependências
+### 1) Criar a Base de Dados
 
-Execute o comando a seguir no terminal para baixar as dependências e compilar o projeto:
-
-./mvnw clean install -DskipTests
-
-### Criar a Base de Dados
-
-Certifique-se de ter o PostgreSQL rodando localmente na sua máquina e execute o seguinte comando no seu SGBD para criar a base de dados:
-
+Certifique-se de que o PostgreSQL está em execução localmente e crie a base de dados:
+```
 CREATE DATABASE db_raizes_nordeste;
+```
+### 2) Instalar Dependências
 
-### Iniciar a API
+Execute no terminal (Linux/macOS):
+```
+./mvnw clean install -DskipTests
+```
+No Windows:
+```
+mvnw.cmd clean install -DskipTests
+```
+### 3) Iniciar a API
 
+Execute no terminal (Linux/macOS):
+```
 ./mvnw spring-boot:run
-
+```
+No Windows:
+```
+mvnw.cmd spring-boot:run
+```
 ## Coleção de Testes Postman (.json)
 
 O arquivo com a coleção de chamadas (raizes-do-nordeste.postman_collection.json) está disponível na raiz do repositório. 
@@ -85,23 +86,23 @@ T10 - Consulta do saldo do programa de fidelidade
 
 O DER está disponível no repositório. As principais tabelas mapeadas para o banco PostgreSQL incluem:
 
-• Unidades
+- Unidades
 
-• Produtos
+- Produtos
 
-• Estoque
+- Estoque
 
-• Pedidos
+- Pedidos
 
-• Itens do Pedido
+- Itens do Pedido
 
-• Clientes
+- Clientes
 
-• Usuarios
+- Usuarios
 
 ## Evidências
 
 URL do Swagger Local: http://localhost:8080/swagger-ui/index.html
 
-Arquivo da Coleção Postman: \docs\postman\raizes-do-nordeste.postman_collection.json (Disponível na raiz do repositório)
+Ficheiro da Coleção Postman: \docs\postman\raizes-do-nordeste.postman_collection.json
 
