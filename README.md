@@ -26,6 +26,8 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.defer-datasource-initialization=true
 spring.sql.init.mode=always
 ```
+Observação: O banco de dados é povoado automaticamente ao iniciar a aplicação (spring.sql.init.mode=always). 
+Os dados necessários para a execução dos testes T01 a T10 são inseridos sem a necessidade de rodar scripts manuais.
 
 ## Como Executar o Projeto
 
@@ -57,52 +59,54 @@ mvnw.cmd spring-boot:run
 ```
 ## Coleção de Testes Postman (.json)
 
-O arquivo com a coleção de chamadas (raizes-do-nordeste.postman_collection.json) está disponível na raiz do repositório. 
+O arquivo com a coleção de chamadas (raizes-do-nordeste.postman_collection.json) está disponível na pasta docs/postman/. 
 Para facilitar a correção e avaliação do projeto, os testes foram organizados de T01 a T10, cobrindo o fluxo principal, regras de negócio e bloqueios de segurança conforme detalhado na documentação.
 
 ### Ordem para Execução dos Testes:
 
+```
 T01 - Registo de novo cliente no sistema
-
 T02 - Tentativa de login com senha incorreta
-
 T03 - Login com credenciais válidas
-
 T04 - Acesso a recurso protegido sem enviar token
-
 T05 - Tentativa de alteração de estoque com perfil de cliente
-
 T06 - Consulta de cardápio filtrado por unidade
-
 T07 - Criação de pedido com canal e estoque válidos
-
 T08 - Criação de pedido com quantidade superior ao estoque
-
 T09 - Processamento de pagamento simulado aprovado
-
 T10 - Consulta do saldo do programa de fidelidade
+```
 
-## Banco de Dados e Modelo (DER)
+## Diagramas do Sistema
+
+### Diagrama Entidade Relacionamento
+<img src="docs/diagramas/der/diagrama-entidade-relacionamento.png" width="900">
 
 O DER está disponível no repositório. As principais tabelas mapeadas para o banco PostgreSQL incluem:
 
+```
 - Unidades
-
 - Produtos
-
 - Estoque
-
 - Pedidos
-
 - Itens do Pedido
-
 - Clientes
+```
 
-- Usuarios
+### Diagrama de Caso de Uso
+<img src="docs/diagramas/uml/diagrama-de-casos-de-uso.png" width="700">
+
+### Diagrama de Classe
+<img src="docs/diagramas/uml/diagrama-de-classe.png" width="900">
+
+### Diagrama Entidade Relacionamento
+<img src="docs/diagramas/uml/diagrama-de-sequencia.png" width="700">
 
 ## Evidências
 
 URL do Swagger Local: http://localhost:8080/swagger-ui/index.html
 
 Ficheiro da Coleção Postman: \docs\postman\raizes-do-nordeste.postman_collection.json
+
+
 
