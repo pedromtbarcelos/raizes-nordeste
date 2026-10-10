@@ -129,7 +129,7 @@
             "pedidos"
           ]
         },
-        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers ou Authorization, garanta que nenhum header Authorization está sendo enviado\n    \n3. Na aba Body (raw / JSON), garanta que não tenha nenhum JSON\n    \n4. Clique em Send.\n    \n5. Validação: A API deve recusar o acesso e retornar o status 401 Unauthorized"
+        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers ou Authorization, garanta que nenhum header Authorization está sendo enviado\n    \n3. Na aba Body (raw / JSON), garanta que não tenha nenhum JSON\n    \n4. Clique em Send.\n    \n5. Validação: A API deve recusar o acesso e retornar o status 403 Forbidden"
       },
       "response": []
     },
@@ -166,7 +166,7 @@
             "1"
           ]
         },
-        "description": "1. Verifique o método `PUT` e o URL `http://localhost:8080/api/v1/estoques/1`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n4. Confirme se o seguinte conteúdo está presente:\n    \n    1. { \"quantidadeSaldo\": 150 }\n        \n5. Clique em Send\n    \n6. Validação: Como a conta possui o perfil ROLE_CLIENTE, o sistema deve negar a ação e retornar o status 403 Forbidden"
+        "description": "1. Verifique o método `PUT` e o URL `http://localhost:8080/api/v1/estoques/1`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer + TOKEN\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n4. Confirme se o seguinte conteúdo está presente:\n    \n    1. { \"quantidadeSaldo\": 150 }\n        \n5. Clique em Send\n    \n6. Validação: Como a conta possui o perfil ROLE_CLIENTE, o sistema deve negar a ação e retornar o status 403 Forbidden"
       },
       "response": []
     },
@@ -235,7 +235,7 @@
             "pedidos"
           ]
         },
-        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t07-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"TOTEM\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 2}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Clique em Send\n    \n5. Validação: Confirme o status 201 Created e tome nota do id do pedido criado (ex: id: 1) e do status inicial AGUARDANDO_PAGAMENTO"
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer + TOKEN\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t07-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"TOTEM\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 2}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Clique em Send\n    \n5. Validação: Confirme o status 201 Created e tome nota do id do pedido criado (ex: id: 1) e do status inicial AGUARDANDO_PAGAMENTO"
       },
       "response": []
     },
@@ -271,7 +271,7 @@
             "pedidos"
           ]
         },
-        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Vá à aba Headers, enc\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t08-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"APP\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 999}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Na aba Body (raw / JSON), note a tentativa de compra de uma quantidade intencionalmente alta (999)\n    \n5. Clique em Send\n    \n6. Validação: A resposta deve indicar erro de regra de negócio por escassez de estoque (status 409 Conflict ou 422 Unprocessable Entity)"
+        "description": "1. Verifique o método `POST` e o URL `http://localhost:8080/api/v1/pedidos`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer + TOKEN\n    \n3. Na aba Body, selecione o modo raw e defina o formato como JSON\n    \n    1. {  \n        \"idempotencyKey\": \"t08-key\",  \n        \"idCliente\": 1,  \n        \"idUnidade\": 1,  \n        \"canalPedido\": \"APP\",  \n        \"itens\": \\[{\"idProduto\": 1, \"quantidade\": 999}\\],  \n        \"formaPagamento\": \"PIX\"  \n        }\n        \n4. Na aba Body (raw / JSON), note a tentativa de compra de uma quantidade intencionalmente alta (999)\n    \n5. Clique em Send\n    \n6. Validação: A resposta deve indicar erro de regra de negócio por escassez de estoque (status 409 Conflict ou 422 Unprocessable Entity)"
       },
       "response": []
     },
@@ -350,7 +350,7 @@
             "saldo"
           ]
         },
-        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/fidelidade/saldo`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer\n    \n3. Clique em Send\n    \n4. Validação: A resposta deve exibir 200 OK juntamente com o saldo atualizado dos pontos de fidelidade acumulados pelo cliente"
+        "description": "1. Verifique o método `GET` e o URL `http://localhost:8080/api/v1/fidelidade/saldo`\n    \n2. Na aba Headers, insira a chave Authorization com o valor Bearer + TOKEN\n    \n3. Clique em Send\n    \n4. Validação: A resposta deve exibir 200 OK juntamente com o saldo atualizado dos pontos de fidelidade acumulados pelo cliente"
       },
       "response": []
     }
