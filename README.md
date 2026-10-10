@@ -31,32 +31,61 @@ Os dados necessários para a execução dos testes T01 a T10 são inseridos sem 
 
 ## Como Executar o Projeto
 
-### 1) Criar a Base de Dados
+### Opção 1 - Usando Docker
+Se você possui o Docker e o Docker Compose instalados, esta é a forma mais prática, pois ela sobe o container do banco de dados e da aplicação integrados:
+
+#### 1) Na raiz do projeto, execute o comando:
+```
+docker-compose up --build
+```
+
+#### 2) Para parar os containers, utilize:
+```
+docker-compose down
+```
+### Opção 2 - Usando Terminal (Recomendado)
+
+#### 1) Criar a Base de Dados
 
 Certifique-se de que o PostgreSQL está em execução localmente e crie a base de dados:
 ```
 CREATE DATABASE db_raizes_nordeste;
 ```
-### 2) Instalar Dependências
 
-Execute no terminal (Linux/macOS):
+#### 2) Instalar Dependências
+
+Execute no terminal
 ```
 ./mvnw clean install -DskipTests
 ```
-No Windows:
-```
-mvnw.cmd clean install -DskipTests
-```
-### 3) Iniciar a API
 
-Execute no terminal (Linux/macOS):
+#### 3) Iniciar a API
+
+Execute no terminal
 ```
 ./mvnw spring-boot:run
 ```
-No Windows:
-```
-mvnw.cmd spring-boot:run
-```
+### Opção 3 - Executando pela IDE
+
+1) Abra o projeto em sua IDE
+2) Certifique-se de que o seu PostgreSQL está rodando e que as credenciais no arquivo application.properties estão corretas.
+3) Navegue até o código-fonte em src/main/java/com.raizesdonordeste.backend/ e localize a classe principal de inicialização (BackendApplication.java).
+4) Clique com o botão direito sobre essa classe e selecione Run.
+
+### Erro de Porta
+
+Por padrão, esta aplicação está configurada para rodar na porta 8080.
+
+* Porta Livre: Para que o projeto suba com sucesso, a porta 8080 precisa estar totalmente livre no seu computador.
+
+* O que acontece se a porta estiver ocupada? Se houver outro processo ou uma instância anterior da aplicação rodando em segundo plano, o Spring Boot exibirá um erro informando que o servidor web falhou ao iniciar porque a porta 8080 já está em uso (Port 8080 was already in use).
+
+Como resolver se a porta estiver ocupada?
+
+1) Liberar a porta (Recomendado para avaliações): Identifique e encerre o processo que está travando a porta 8080 no seu sistema operacional antes de iniciar o projeto novamente.
+2) Alterar a porta da aplicação: Caso prefira ou precise rodar em outra porta, abra o arquivo de configuração localizado em:
+src/main/resources/application.properties e altere a propriedade server.port para uma porta livre (por exemplo, 8081).
+
 ## Coleção de Testes Postman (.json)
 
 O arquivo com a coleção de chamadas (raizes-do-nordeste.postman_collection.json) está disponível na pasta docs/postman/. 
